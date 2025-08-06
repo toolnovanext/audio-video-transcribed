@@ -3,20 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced AI Transcriber</title>
+    <title>AI-Powered Transcription Service</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.7/axios.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.0.18/marked.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.10/clipboard.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/toastify-js@1.12.0/src/toastify.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/toastify-js@1.12.0/src/toastify.min.css" rel="stylesheet">
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Roboto', Arial, sans-serif;
             max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
             background-color: #f5f7fa;
+        }
+        .header {
+            background: linear-gradient(90deg, #007bff, #00d4ff);
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            font-weight: 700;
+        }
+        .header p {
+            margin: 5px 0 0;
+            font-size: 1.2em;
+            font-weight: 300;
         }
         .container {
             background: #fff;
@@ -107,20 +127,14 @@
         .collapsible-content.active {
             display: block;
         }
-        .settings-section {
-            margin: 10px 0;
-        }
-        .settings-section select, .settings-section input {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            border-radius: 6px;
-            border: 1px solid #ccc;
-        }
         .welcome-message {
             text-align: center;
             margin-bottom: 20px;
             color: #555;
+        }
+        .welcome-message p {
+            margin: 10px 0;
+            font-size: 1.1em;
         }
         .control-buttons {
             display: flex;
@@ -137,186 +151,53 @@
         h1, h3 {
             color: #333;
         }
+        .transcription-heading {
+            font-size: 1.5em;
+            margin: 10px 0;
+            color: #007bff;
+            display: none;
+        }
+        .transcription-heading.active {
+            display: block;
+        }
+        .toast-container {
+            margin-top: 20px;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
+    <div class="header">
+        <h1>AI-Powered Transcription Service</h1>
+        <p>Transform your audio and video files into accurate transcriptions with ease</p>
+    </div>
     <div class="container">
-        <h1 role="heading" aria-level="1">Advanced AI Transcriber</h1>
-        <div role="region" aria-labelledby="settings-heading">
-            <button class="collapsible" id="settings-heading" aria-expanded="false" aria-controls="settings-content" role="button">Settings</button>
-            <div id="settings-content" class="collapsible-content" role="region" aria-labelledby="settings-heading">
-                <div class="settings-section">
-                    <label for="aiModel">Select an AI Model:</label>
-                    <select id="aiModel">
-                        <option value="gemini-1.5-pro">Gemini 1.5 Pro</option>
-                        <option value="gemini-2.5-flash" selected>Gemini 2.5 Flash</option>
-                        <option value="gemini-2.5-pro">Gemini 2.5 Pro</option>
-                    </select>
-                    <label for="summaryLang">Select TTS Language:</label>
-                    <select id="summaryLang">
-                        <option value="Afrikaans">Afrikaans</option>
-                        <option value="Albanian">Albanian</option>
-                        <option value="Amharic">Amharic</option>
-                        <option value="Arabic">Arabic</option>
-                        <option value="Armenian">Armenian</option>
-                        <option value="Azerbaijani">Azerbaijani</option>
-                        <option value="Basque">Basque</option>
-                        <option value="Belarusian">Belarusian</option>
-                        <option value="Bengali">Bengali</option>
-                        <option value="Bosnian">Bosnian</option>
-                        <option value="Bulgarian">Bulgarian</option>
-                        <option value="Catalan">Catalan</option>
-                        <option value="Cebuano">Cebuano</option>
-                        <option value="Chichewa">Chichewa</option>
-                        <option value="Chinese">Chinese</option>
-                        <option value="Corsican">Corsican</option>
-                        <option value="Croatian">Croatian</option>
-                        <option value="Czech">Czech</option>
-                        <option value="Danish">Danish</option>
-                        <option value="Dutch">Dutch</option>
-                        <option value="English" selected>English</option>
-                        <option value="Esperanto">Esperanto</option>
-                        <option value="Estonian">Estonian</option>
-                        <option value="Filipino">Filipino</option>
-                        <option value="Finnish">Finnish</option>
-                        <option value="French">French</option>
-                        <option value="Frisian">Frisian</option>
-                        <option value="Galician">Galician</option>
-                        <option value="Georgian">Georgian</option>
-                        <option value="German">German</option>
-                        <option value="Greek">Greek</option>
-                        <option value="Gujarati">Gujarati</option>
-                        <option value="Haitian Creole">Haitian Creole</option>
-                        <option value="Hausa">Hausa</option>
-                        <option value="Hebrew">Hebrew</option>
-                        <option value="Hindi">Hindi</option>
-                        <option value="Hmong">Hmong</option>
-                        <option value="Hungarian">Hungarian</option>
-                        <option value="Icelandic">Icelandic</option>
-                        <option value="Igbo">Igbo</option>
-                        <option value="Indonesian">Indonesian</option>
-                        <option value="Irish">Irish</option>
-                        <option value="Italian">Italian</option>
-                        <option value="Japanese">Japanese</option>
-                        <option value="Javanese">Javanese</option>
-                        <option value="Kannada">Kannada</option>
-                        <option value="Kazakh">Kazakh</option>
-                        <option value="Khmer">Khmer</option>
-                        <option value="Korean">Korean</option>
-                        <option value="Kurdish">Kurdish</option>
-                        <option value="Kyrgyz">Kyrgyz</option>
-                        <option value="Lao">Lao</option>
-                        <option value="Latin">Latin</option>
-                        <option value="Latvian">Latvian</option>
-                        <option value="Lithuanian">Lithuanian</option>
-                        <option value="Luxembourgish">Luxembourgish</option>
-                        <option value="Macedonian">Macedonian</option>
-                        <option value="Malagasy">Malagasy</option>
-                        <option value="Malay">Malay</option>
-                        <option value="Malayalam">Malayalam</option>
-                        <option value="Maltese">Maltese</option>
-                        <option value="Maori">Maori</option>
-                        <option value="Marathi">Marathi</option>
-                        <option value="Mongolian">Mongolian</option>
-                        <option value="Myanmar">Myanmar</option>
-                        <option value="Nepali">Nepali</option>
-                        <option value="Norwegian">Norwegian</option>
-                        <option value="Odia">Odia</option>
-                        <option value="Pashto">Pashto</option>
-                        <option value="Persian">Persian</option>
-                        <option value="Polish">Polish</option>
-                        <option value="Portuguese">Portuguese</option>
-                        <option value="Punjabi">Punjabi</option>
-                        <option value="Romanian">Romanian</option>
-                        <option value="Russian">Russian</option>
-                        <option value="Samoan">Samoan</option>
-                        <option value="Scots Gaelic">Scots Gaelic</option>
-                        <option value="Serbian">Serbian</option>
-                        <option value="Sesotho">Sesotho</option>
-                        <option value="Shona">Shona</option>
-                        <option value="Sindhi">Sindhi</option>
-                        <option value="Sinhala">Sinhala</option>
-                        <option value="Slovak">Slovak</option>
-                        <option value="Slovenian">Slovenian</option>
-                        <option value="Somali">Somali</option>
-                        <option value="Spanish">Spanish</option>
-                        <option value="Sundanese">Sundanese</option>
-                        <option value="Swahili">Swahili</option>
-                        <option value="Swedish">Swedish</option>
-                        <option value="Tajik">Tajik</option>
-                        <option value="Tamil">Tamil</option>
-                        <option value="Telugu">Telugu</option>
-                        <option value="Thai">Thai</option>
-                        <option value="Turkish">Turkish</option>
-                        <option value="Ukrainian">Ukrainian</option>
-                        <option value="Urdu">Urdu</option>
-                        <option value="Uzbek">Uzbek</option>
-                        <option value="Vietnamese">Vietnamese</option>
-                        <option value="Welsh">Welsh</option>
-                        <option value="Xhosa">Xhosa</option>
-                        <option value="Yiddish">Yiddish</option>
-                        <option value="Yoruba">Yoruba</option>
-                        <option value="Zulu">Zulu</option>
-                    </select>
-                    <label for="userName">Enter Your Name:</label>
-                    <input type="text" id="userName" placeholder="Your Name">
-                    <div class="control-buttons">
-                        <button class="action-btn" onclick="saveSettings()">Save</button>
-                        <button class="action-btn" onclick="cancelSettings()">Cancel</button>
-                    </div>
-                </div>
-            </div>
-        </div>
         <div id="welcomeMessage" class="welcome-message">
-            Welcome to the Advanced AI Transcriber! Upload any video or audio file to get a detailed transcription with timestamps.
+            <p>Welcome to our AI-Powered Transcription Service, designed to deliver precise and efficient transcriptions.</p>
+            <p>This service leverages advanced generative AI technology, which may occasionally produce errors.</p>
+            <p>Developed by Sujan Rai at The Accessible Resource, this comprehensive tool enables seamless transcription of audio and video files.</p>
+            <p>Upload your media file to generate a detailed transcription with accurate timestamps.</p>
         </div>
         <section class="control-buttons">
-            <button class="file-upload-btn" onclick="document.getElementById('fileInput').click()">Attach a File</button>
-            <button id="removeBtn" style="display: none;" class="action-btn" onclick="removeMedia()">Remove File</button>
+            <button class="file-upload-btn" onclick="document.getElementById('fileInput').click()">Upload Media File</button>
+            <button id="removeBtn" style="display: none;" class="action-btn" onclick="removeMedia()">Remove Media File</button>
             <input type="file" id="fileInput" accept="video/mp4,video/x-matroska,video/webm,video/avi,video/mpeg,video/ogv,audio/mpeg,audio/wav,audio/ogg,audio/flac,audio/aac">
         </section>
         <video id="videoPlayer" class="media-player" controls></video>
         <audio id="audioPlayer" class="media-player" controls preload="none"></audio>
-        <button id="transcribeBtn" class="action-btn" onclick="transcribeMedia()" disabled>Transcribe Content</button>
+        <button id="transcribeBtn" class="action-btn" onclick="transcribeMedia()">Generate Transcription</button>
         <div id="loading" class="loading"></div>
         <div id="error" class="error"></div>
         <div id="transcriptions"></div>
+        <div class="toast-container" id="toastContainer"></div>
     </div>
 
     <script>
         // API Configuration
-        const API_KEY = 'AIzaSyC2Fsjk3yCRA8hDVYgg5LlMn4sxwoJJaWU'; // Pro API key for all models
-        let selectedModel = 'gemini-2.5-flash';
-        let selectedLang = 'English';
-        let userName = '';
+        const API_KEY = 'AIzaSyC2Fsjk3yCRA8hDVYgg5LlMn4sxwoJJaWU';
+        const selectedModel = 'gemini-2.5-pro';
         let currentFileUrl = null;
         let transcriptionCounter = 0;
-        let responseSounds = {};
-
-        // Language code mapping for TTS
-        const languageCodeMap = {
-            'Afrikaans': 'af', 'Albanian': 'sq', 'Amharic': 'am', 'Arabic': 'ar', 'Armenian': 'hy',
-            'Azerbaijani': 'az', 'Basque': 'eu', 'Belarusian': 'be', 'Bengali': 'bn', 'Bosnian': 'bs',
-            'Bulgarian': 'bg', 'Catalan': 'ca', 'Cebuano': 'ceb', 'Chichewa': 'ny', 'Chinese': 'zh',
-            'Corsican': 'co', 'Croatian': 'hr', 'Czech': 'cs', 'Danish': 'da', 'Dutch': 'nl',
-            'English': 'en', 'Esperanto': 'eo', 'Estonian': 'et', 'Filipino': 'tl', 'Finnish': 'fi',
-            'French': 'fr', 'Frisian': 'fy', 'Galician': 'gl', 'Georgian': 'ka', 'German': 'de',
-            'Greek': 'el', 'Gujarati': 'gu', 'Haitian Creole': 'ht', 'Hausa': 'ha', 'Hebrew': 'he',
-            'Hindi': 'hi', 'Hmong': 'hmn', 'Hungarian': 'hu', 'Icelandic': 'is', 'Igbo': 'ig',
-            'Indonesian': 'id', 'Irish': 'ga', 'Italian': 'it', 'Japanese': 'ja', 'Javanese': 'jv',
-            'Kannada': 'kn', 'Kazakh': 'kk', 'Khmer': 'km', 'Korean': 'ko', 'Kurdish': 'ku',
-            'Kyrgyz': 'ky', 'Lao': 'lo', 'Latin': 'la', 'Latvian': 'lv', 'Lithuanian': 'lt',
-            'Luxembourgish': 'lb', 'Macedonian': 'mk', 'Malagasy': 'mg', 'Malay': 'ms', 'Malayalam': 'ml',
-            'Maltese': 'mt', 'Maori': 'mi', 'Marathi': 'mr', 'Mongolian': 'mn', 'Myanmar': 'my',
-            'Nepali': 'ne', 'Norwegian': 'no', 'Odia': 'or', 'Pashto': 'ps', 'Persian': 'fa',
-            'Polish': 'pl', 'Portuguese': 'pt', 'Punjabi': 'pa', 'Romanian': 'ro', 'Russian': 'ru',
-            'Samoan': 'sm', 'Scots Gaelic': 'gd', 'Serbian': 'sr', 'Sesotho': 'st', 'Shona': 'sn',
-            'Sindhi': 'sd', 'Sinhala': 'si', 'Slovak': 'sk', 'Slovenian': 'sl', 'Somali': 'so',
-            'Spanish': 'es', 'Sundanese': 'su', 'Swahili': 'sw', 'Swedish': 'sv', 'Tajik': 'tg',
-            'Tamil': 'ta', 'Telugu': 'te', 'Thai': 'th', 'Turkish': 'tr', 'Ukrainian': 'uk',
-            'Urdu': 'ur', 'Uzbek': 'uz', 'Vietnamese': 'vi', 'Welsh': 'cy', 'Xhosa': 'xh',
-            'Yiddish': 'yi', 'Yoruba': 'yo', 'Zulu': 'zu'
-        };
 
         // DOM Elements
         const DOM = {
@@ -329,11 +210,7 @@
             errorDiv: document.getElementById('error'),
             loadingDiv: document.getElementById('loading'),
             welcomeMessage: document.getElementById('welcomeMessage'),
-            aiModel: document.getElementById('aiModel'),
-            summaryLang: document.getElementById('summaryLang'),
-            userNameInput: document.getElementById('userName'),
-            settingsHeading: document.getElementById('settings-heading'),
-            settingsContent: document.getElementById('settings-content')
+            toastContainer: document.getElementById('toastContainer')
         };
 
         // Supported file types
@@ -348,33 +225,6 @@
             '.mpeg': 'video/mpeg', '.ogv': 'video/ogv', '.mp3': 'audio/mpeg', '.wav': 'audio/wav',
             '.ogg': 'audio/ogg', '.flac': 'audio/flac', '.aac': 'audio/aac'
         };
-
-        // Initialize audio elements
-        function initializeAudio(src, volume = 0.5) {
-            const audio = new Audio(src);
-            audio.volume = volume;
-            audio.preload = 'auto';
-            return audio;
-        }
-
-        // Load settings from local storage on page load
-        function loadSettings() {
-            const settings = JSON.parse(localStorage.getItem('transcriberSettings'));
-            if (settings && settings.userName) {
-                DOM.aiModel.value = settings.selectedModel || 'gemini-2.5-flash';
-                DOM.summaryLang.value = settings.selectedLang || 'English';
-                DOM.userNameInput.value = settings.userName || '';
-                selectedModel = DOM.aiModel.value;
-                selectedLang = DOM.summaryLang.value;
-                userName = DOM.userNameInput.value;
-                DOM.transcribeBtn.disabled = false;
-            } else {
-                DOM.transcribeBtn.disabled = true;
-                DOM.settingsContent.classList.add('active');
-                DOM.settingsHeading.setAttribute('aria-expanded', 'true');
-                showError('Please set up your settings before proceeding.');
-            }
-        }
 
         // Initialize collapsible listeners
         function initializeCollapsible() {
@@ -406,7 +256,7 @@
         DOM.fileInput.addEventListener('change', async (event) => {
             const file = event.target.files[0];
             if (!file) {
-                showError('No file selected.');
+                showError('No media file selected.');
                 return;
             }
 
@@ -419,7 +269,7 @@
             resetMediaPlayers();
             DOM.welcomeMessage.style.display = 'none';
             DOM.removeBtn.style.display = 'inline-block';
-            DOM.transcribeBtn.disabled = !userName;
+            DOM.transcribeBtn.disabled = false;
 
             try {
                 if (currentFileUrl) URL.revokeObjectURL(currentFileUrl);
@@ -434,7 +284,7 @@
                     DOM.audioPlayer.load();
                     DOM.audioPlayer.style.display = 'block';
                 } else {
-                    showError('Unsupported file type. Please upload a video or audio file.');
+                    showError('Unsupported file type. Please upload a supported video or audio file.');
                     resetMediaPlayers();
                     DOM.fileInput.value = '';
                     DOM.transcribeBtn.disabled = true;
@@ -444,7 +294,7 @@
                 }
                 clearError();
             } catch (error) {
-                showError(`Error loading file: ${error.message}`);
+                showError(`Error loading media file: ${error.message}`);
                 resetMediaPlayers();
                 DOM.fileInput.value = '';
                 DOM.transcribeBtn.disabled = true;
@@ -465,7 +315,6 @@
                 currentFileUrl = null;
             }
             clearError();
-            showToast('File removed successfully.', 'success');
         }
 
         // Reset media players
@@ -481,7 +330,7 @@
             });
         }
 
-        // Reset everything for Transcribe More
+        // Reset everything for new transcription
         function resetEverything() {
             DOM.fileInput.value = '';
             resetMediaPlayers();
@@ -490,14 +339,6 @@
             DOM.welcomeMessage.style.display = 'block';
             DOM.transcriptionsDiv.innerHTML = '';
             transcriptionCounter = 0;
-            Object.keys(responseSounds).forEach(elementId => {
-                if (!responseSounds[elementId].paused) {
-                    responseSounds[elementId].pause();
-                    responseSounds[elementId].currentTime = 0;
-                    URL.revokeObjectURL(responseSounds[elementId].src);
-                }
-                delete responseSounds[elementId];
-            });
             if (currentFileUrl) {
                 URL.revokeObjectURL(currentFileUrl);
                 currentFileUrl = null;
@@ -505,123 +346,36 @@
             clearError();
         }
 
-        // Save settings to local storage
-        function saveSettings() {
-            selectedModel = DOM.aiModel.value;
-            selectedLang = DOM.summaryLang.value;
-            userName = DOM.userNameInput.value.trim();
-            if (!userName) {
-                showError('Please enter a valid name.');
-                return;
-            }
-            localStorage.setItem('transcriberSettings', JSON.stringify({
-                selectedModel,
-                selectedLang,
-                userName
-            }));
-            toggleCollapsible('settings-content');
-            DOM.transcribeBtn.disabled = false;
-            showToast('Settings saved successfully.', 'success');
-        }
-
-        // Cancel settings
-        function cancelSettings() {
-            const settings = JSON.parse(localStorage.getItem('transcriberSettings')) || {};
-            DOM.aiModel.value = settings.selectedModel || 'gemini-2.5-flash';
-            DOM.summaryLang.value = settings.selectedLang || 'English';
-            DOM.userNameInput.value = settings.userName || '';
-            toggleCollapsible('settings-content');
-            showToast('Settings unchanged.', 'info');
-        }
-
-        // Play response audio
-        async function playResponse(elementId) {
-            const button = document.querySelector(`button[data-response-id="${elementId}"]`);
-            if (!button) return;
-
-            // If the sound is playing, stop it
-            if (responseSounds[elementId] && !responseSounds[elementId].paused) {
-                responseSounds[elementId].pause();
-                responseSounds[elementId].currentTime = 0;
-                URL.revokeObjectURL(responseSounds[elementId].src);
-                delete responseSounds[elementId];
-                button.textContent = 'Play Transcription';
-                button.setAttribute('aria-label', 'Play transcription audio');
-                return;
-            }
-
-            button.textContent = 'Playing Transcription';
-            button.setAttribute('aria-label', 'Playing transcription audio');
-            button.disabled = true;
-
-            try {
-                const element = document.getElementById(elementId);
-                const text = element.textContent;
-                const encodedText = encodeURIComponent(text);
-                const langCode = languageCodeMap[selectedLang] || 'en';
-                const response = await axios.get(`https://techassistantforblind.com/modules/gtts.php?text=${encodedText}&lang=${langCode}`, {
-                    responseType: 'blob'
-                });
-                const audioBlob = response.data;
-                const audioUrl = URL.createObjectURL(audioBlob);
-
-                responseSounds[elementId] = initializeAudio(audioUrl, 0.5);
-                responseSounds[elementId].onended = () => {
-                    button.textContent = 'Play Transcription';
-                    button.setAttribute('aria-label', 'Play transcription audio');
-                    URL.revokeObjectURL(audioUrl);
-                    delete responseSounds[elementId];
-                    button.disabled = false;
-                };
-                responseSounds[elementId].onerror = () => {
-                    showError('Error playing audio transcription.');
-                    button.textContent = 'Play Transcription';
-                    button.setAttribute('aria-label', 'Play transcription audio');
-                    URL.revokeObjectURL(audioUrl);
-                    delete responseSounds[elementId];
-                    button.disabled = false;
-                };
-
-                await responseSounds[elementId].play();
-                button.textContent = 'Stop Transcription';
-                button.setAttribute('aria-label', 'Stop transcription audio');
-                button.disabled = false;
-            } catch (error) {
-                showError(`Error playing transcription: ${error.message}`);
-                button.textContent = 'Play Transcription';
-                button.setAttribute('aria-label', 'Play transcription audio');
-                button.disabled = false;
-            }
-        }
-
         // Transcribe media content
-        async function transcribeMedia() {
-            if (!userName) {
-                showError('Please set up everything in the settings and try again.');
-                return;
-            }
-
+        async function transcribeMedia(transcriptionId = null) {
             const file = DOM.fileInput.files[0];
             if (!file) {
-                showError('Please select a file.');
+                showError('Please select a media file to transcribe.');
                 return;
             }
 
-            const transcriptionId = `transcription-${transcriptionCounter++}`;
-            DOM.transcriptionsDiv.insertAdjacentHTML('afterbegin', `
-                <div class="transcription-card" id="${transcriptionId}">
-                    <p id="transcriptionresponse-${transcriptionId}" class="transcription-content loading">AI is transcribing...</p>
-                </div>
-            `);
+            const isRegenerate = !!transcriptionId;
+            if (!isRegenerate) {
+                transcriptionId = `transcription-${transcriptionCounter++}`;
+                DOM.transcriptionsDiv.insertAdjacentHTML('afterbegin', `
+                    <div class="transcription-card" id="${transcriptionId}">
+                        <div id="transcriptionresponse-${transcriptionId}" class="transcription-content loading">Generating transcription...</div>
+                    </div>
+                `);
+            } else {
+                const transcriptionElement = document.getElementById(`transcriptionresponse-${transcriptionId}`);
+                transcriptionElement.innerHTML = 'Generating transcription...';
+                transcriptionElement.classList.add('loading');
+            }
 
-            showLoading(true, 'Transcribing content...');
+            showLoading(true, 'Processing transcription...');
             DOM.transcribeBtn.disabled = true;
 
             try {
                 const base64Data = await fileToBase64(file);
                 const mimeType = file.type || extensionToMime[`.${file.name.split('.').pop().toLowerCase()}`];
 
-                const prompt = `Transcribe this in high accuracy and with timestamps. Transcription will be done in the video or audio language. Write the complete response in markdown.`;
+                const prompt = `Generate a highly accurate transcription of the provided audio or video file, including precise timestamps for each segment. The transcription should be performed in the original language of the media content. Format the output as well-structured Markdown, with each segment listed as a numbered item (e.g., - [00:01] ...). Ensure the list is sequential and uses three-digit numbering (e.g., 001, 002, etc.).`;
 
                 if (!supportedFiles.video.includes(mimeType) && !supportedFiles.audio.includes(mimeType)) {
                     throw new Error('Unsupported file type for transcription.');
@@ -641,34 +395,45 @@
                 if (!transcription) throw new Error('No transcription received from API.');
 
                 const transcriptionElement = document.getElementById(`transcriptionresponse-${transcriptionId}`);
-                transcriptionElement.innerHTML = marked.parse(transcription);
+                transcriptionElement.innerHTML = marked.parse(transcription, { gfm: true, breaks: true });
                 transcriptionElement.classList.remove('loading');
 
-                // Add More Actions and Transcribe More
-                transcriptionElement.insertAdjacentHTML('afterend', `
-                    <button class="collapsible" aria-expanded="false" aria-controls="actions-${transcriptionId}" role="button">More Actions</button>
-                    <div id="actions-${transcriptionId}" class="collapsible-content">
-                        <div class="action-buttons">
-                            <ul>
-                                <li><button class="copy-btn action-btn" data-clipboard-target="#transcriptionresponse-${transcriptionId}">Copy Transcription</button></li>
-                                <li><button class="action-btn" data-response-id="transcriptionresponse-${transcriptionId}" onclick="playResponse('transcriptionresponse-${transcriptionId}')">Play Transcription</button></li>
-                                <li><button class="action-btn" onclick="downloadText('transcriptionresponse-${transcriptionId}')">Download Transcription</button></li>
-                                <li><button class="action-btn" onclick="deleteTranscription('${transcriptionId}')">Delete Transcription</button></li>
-                            </ul>
+                // Show transcription heading
+                const heading = document.createElement('h3');
+                heading.className = 'transcription-heading active';
+                heading.textContent = 'Transcription';
+                transcriptionElement.parentNode.insertBefore(heading, transcriptionElement);
+
+                // Add or update action buttons
+                let actionsContainer = document.getElementById(`actions-${transcriptionId}`);
+                if (!actionsContainer) {
+                    transcriptionElement.insertAdjacentHTML('afterend', `
+                        <button class="collapsible" aria-expanded="false" aria-controls="actions-${transcriptionId}" role="button">Transcription Actions</button>
+                        <div id="actions-${transcriptionId}" class="collapsible-content">
+                            <div class="action-buttons">
+                                <ul>
+                                    <li><button class="copy-btn action-btn" data-clipboard-target="#transcriptionresponse-${transcriptionId}">Copy Transcription</button></li>
+                                    <li><button class="action-btn" onclick="transcribeMedia('${transcriptionId}')">Regenerate Transcription</button></li>
+                                    <li><button class="action-btn" onclick="downloadTranscription('transcriptionresponse-${transcriptionId}')">Download as PDF</button></li>
+                                    <li><button class="action-btn" onclick="deleteTranscription('${transcriptionId}')">Delete Transcription</button></li>
+                                </ul>
+                            </div>
                         </div>
-                    </div>
-                    <button class="action-btn" onclick="resetEverything()">Transcribe More</button>
-                `);
+
+                        <p>generative AI might have made mistakes in transcription, regenerate for more accuracy.</p>
+                        <button class="action-btn" onclick="resetEverything()">Start New Transcription</button>
+                    `);
+                }
 
                 initializeCollapsible();
                 new ClipboardJS(`#actions-${transcriptionId} .copy-btn`).on('success', handleCopySuccess).on('error', handleCopyError);
-                showToast('Transcription generated successfully.', 'success');
             } catch (error) {
-                showError(`Error processing file: ${error.message}`);
-                document.getElementById(transcriptionId)?.remove();
+                showError(`Error processing transcription: ${error.message}`);
+                if (!isRegenerate) document.getElementById(transcriptionId)?.remove();
             } finally {
                 DOM.transcribeBtn.disabled = false;
                 showLoading(false);
+                showToast(isRegenerate ? 'Transcription regenerated successfully.' : 'Transcription generated successfully.', 'success');
             }
         }
 
@@ -686,29 +451,33 @@
             }
         }
 
-        function downloadText(elementId) {
+        function downloadTranscription(elementId) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
             const element = document.getElementById(elementId);
             const text = element.textContent;
-            const blob = new Blob([text], { type: 'text/plain' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `${elementId}.txt`;
-            a.click();
-            URL.revokeObjectURL(url);
-            showToast('Transcription downloaded successfully.', 'success');
+
+            doc.setFontSize(12);
+            doc.setFont('helvetica', 'normal');
+
+            const lines = doc.splitTextToSize(text, 180);
+            let y = 20;
+            lines.forEach(line => {
+                if (y > 280) {
+                    doc.addPage();
+                    y = 20;
+                }
+                doc.text(line, 15, y);
+                y += 7;
+            });
+
+            doc.save(`${elementId}.pdf`);
+            showToast('Transcription downloaded as PDF successfully.', 'success');
         }
 
         function deleteTranscription(transcriptionId) {
             const element = document.getElementById(transcriptionId);
             if (element) {
-                const responseId = `transcriptionresponse-${transcriptionId}`;
-                if (responseSounds[responseId] && !responseSounds[responseId].paused) {
-                    responseSounds[responseId].pause();
-                    responseSounds[responseId].currentTime = 0;
-                    URL.revokeObjectURL(responseSounds[responseId].src);
-                    delete responseSounds[responseId];
-                }
                 element.remove();
                 showToast('Transcription deleted successfully.', 'success');
             }
@@ -760,7 +529,8 @@
                 gravity: 'bottom',
                 position: 'center',
                 backgroundColor: background,
-                stopOnFocus: true
+                stopOnFocus: true,
+                destination: '#toastContainer'
             }).showToast();
         }
 
@@ -772,18 +542,17 @@
                 btn.textContent = 'Copy Transcription';
                 btn.classList.remove('copied');
             }, 3000);
-            showToast('Transcription copied to clipboard!', 'success');
             e.clearSelection();
+            showToast('Transcription copied to clipboard!', 'success');
         }
 
         function handleCopyError() {
             showError('Failed to copy transcription. Please try again.');
         }
 
-        // Initialize collapsible listeners and load settings on page load
+        // Initialize collapsible listeners on page load
         document.addEventListener('DOMContentLoaded', () => {
             initializeCollapsible();
-            loadSettings();
         });
     </script>
 </body>
